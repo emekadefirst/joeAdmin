@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
+import { Book, Calendar, ChevronRight, Clock, Users } from 'lucide-react';
 import ResponseSidebar from '../components/sidebar';
+import AuditTray from '../components/audit';
 
 const DashboardPage = () => {
   const [selectedResponse, setSelectedResponse] = useState(null);
   
+  // Sample data - replace with actual data from your backend
+  const totalPrograms = 8;
+  const totalDailyContent = 124;
+  
+  const recentPrograms = [
+    {
+      id: 1,
+      title: "Fruits of the Spirit",
+      description: "A 21-day study on Galatians 5:22-23",
+      participants: 24,
+      progress: 65
+    }
+  ];
 
   const sampleResponses = [
     {
@@ -18,7 +33,7 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar Column */}
       <ResponseSidebar 
         responses={sampleResponses}
@@ -26,11 +41,89 @@ const DashboardPage = () => {
       />
       
       {/* Main Content Area */}
-      <div className="flex-1 p-8 overflow-y-auto">
-        {selectedResponse ? (
-          <div className="bg-white p-6 rounded-lg shadow-sm">
+      <div className="flex-1 p-6 overflow-y-auto">
+        <h1 className="text-2xl font-bold text-blue-900 mb-6">Bible Study Dashboard</h1>
+        
+        {/* Stats Cards Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Programs Card */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="bg-blue-100 p-3 rounded-full">
+                <Book className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <h2 className="text-sm font-medium text-gray-500">Total Programs</h2>
+                <p className="text-2xl font-bold text-gray-800">{totalPrograms}</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Daily Content Card */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="bg-green-100 p-3 rounded-full">
+                <Calendar className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <h2 className="text-sm font-medium text-gray-500">Daily Content Items</h2>
+                <p className="text-2xl font-bold text-gray-800">{totalDailyContent}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Programs Overview Card - Full Width */}
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-blue-900">Study of the day</h2>
+          </div>
+          
+          <div className="divide-y divide-gray-100">
+            {recentPrograms.map(program => (
+              <div key={program.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-medium text-gray-900">{program.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{program.description}</p>
+                    
+                    <div className="flex items-center mt-3 text-sm">
+                      <Users className="h-4 w-4 text-gray-400 mr-1" />
+                      <span className="text-gray-600 mr-4">{program.participants} participants</span>
+                      
+                      <Clock className="h-4 w-4 text-gray-400 mr-1" />
+                      <span className="text-gray-600">Progress: {program.progress}%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full" 
+                        style={{ width: `${program.progress}%` }}
+                      ></div>
+                    </div>
+                    <button className="ml-4 p-2 rounded-full hover:bg-gray-100">
+                      <ChevronRight className="h-5 w-5 text-gray-400" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="p-4 bg-gray-50 border-t border-gray-100 rounded-b-lg">
+            <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              View all programs →
+            </button>
+          </div>
+        </div>
+        <AuditTray />
+        {/* Selected Response Content */}
+        {selectedResponse && (
+          <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold text-blue-900">
+              <h2 className="text-xl font-semibold text-blue-900">
                 {selectedResponse.title}
               </h2>
               <span className="text-sm text-gray-500">
@@ -41,27 +134,10 @@ const DashboardPage = () => {
               {selectedResponse.content}
             </div>
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 mx-auto text-blue-900/20"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">
-                Page under developement
-              </h3>
-
-            </div>
-          </div>
         )}
+      
       </div>
+
     </div>
   );
 };

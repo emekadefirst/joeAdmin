@@ -85,8 +85,8 @@ const Programs = () => {
             />
 
             {/* Main Content Area */}
-            <div className="flex-1 p-6 overflow-y-auto mt-8 min-h-[100vh]">
-                <div className="max-w-4xl mx-9 w-auto">
+            <div className="flex-1 p-6 overflow-y-auto">
+                
                     <h1 className="text-2xl font-bold text-blue-900 mb-6">Programs</h1>
 
                     {/* Add Program Form */}
@@ -191,7 +191,7 @@ const Programs = () => {
                             </div>
                         )}
                     </div>
-                </div>
+
             </div>
 
         </div>
