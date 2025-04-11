@@ -8,6 +8,7 @@ const Programs = () => {
     const [programs, setPrograms] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [editTitle, setEditTitle] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 
     // Sample responses for the sidebar
     const sampleResponses = [
@@ -44,6 +45,7 @@ const Programs = () => {
 
         setPrograms([newProgram, ...programs]);
         setProgramTitle('');
+        setIsModalOpen(false); // Close the modal after adding the program
     };
 
     const handleDeleteProgram = (id) => {
@@ -84,22 +86,53 @@ const Programs = () => {
                 responses={sampleResponses}
                 onSelectResponse={setSelectedResponse}
             />
-            {/* /programs/daily/add */}
             {/* Main Content Area */}
             <div className="flex-1 p-6 overflow-y-auto">
-
                 <h1 className="text-2xl font-bold text-blue-900 mb-6">Programs</h1>
 
                 {/* Add Program Form */}
-                <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <h2 className='my-3'>Create New Program</h2>
-                    <Link
-                        to='/programs/daily/add'
-                        className="inline-block px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors"
-                    >
-                        Add new
-                    </Link>
+                <div className="p-6">
+                    <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+                        <h2 className="my-3">Create New Program</h2>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="inline-block px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors"
+                        >
+                            Add new
+                        </button>
+                    </div>
+
+                    {/* Modal */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0  bg-transparent z-0 backdrop-blur-md backdrop-brightness-50 bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                                <h3 className="text-lg font-semibold mb-4">Add Program Title</h3>
+                                <input
+                                    type="text"
+                                    value={programTitle}
+                                    onChange={(e) => setProgramTitle(e.target.value)}
+                                    placeholder="Program Title"
+                                    className="w-full px-4 py-2 border rounded-md mb-4"
+                                />
+                                <div className="flex justify-between">
+                                    <button
+                                        onClick={() => setIsModalOpen(false)}
+                                        className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleAddProgram}
+                                        className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800"
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
+
                 {/* Programs List */}
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div className="p-4 bg-blue-900/5 border-b border-blue-900/10">
@@ -181,9 +214,7 @@ const Programs = () => {
                         </div>
                     )}
                 </div>
-
             </div>
-
         </div>
     );
 };

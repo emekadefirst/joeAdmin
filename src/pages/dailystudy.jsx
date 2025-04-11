@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Book, Clock, ChevronDown, Search, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
 import ResponseSidebar from '../components/sidebar';
+import { Link } from "react-router-dom";
 
 const DailyContent = () => {
   const [selectedResponse, setSelectedResponse] = useState(null);
@@ -176,73 +177,13 @@ const DailyContent = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="w-full md:w-auto px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors flex items-center justify-center"
-          >
+          <Link to='/programs/daily/add' className="w-full md:w-auto px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors flex items-center justify-center">
             <PlusCircle className="h-4 w-4 mr-2" />
             Add Daily Content
-          </button>
+          </Link>
         </div>
 
-        {/* Add Content Form */}
-        {showAddForm && (
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-            <h2 className="text-lg font-semibold text-blue-900 mb-4">Create New Content</h2>
-            <form onSubmit={handleAddContent} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="contentTitle" className="block text-sm font-medium text-gray-700 mb-1">
-                    Content Title
-                  </label>
-                  <input
-                    id="contentTitle"
-                    type="text"
-                    placeholder="e.g., Day 1: Introduction"
-                    value={contentTitle}
-                    onChange={(e) => setContentTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/30"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-1">
-                    Program
-                  </label>
-                  <select
-                    id="program"
-                    value={selectedProgram}
-                    onChange={(e) => setSelectedProgram(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/30"
-                    required
-                  >
-                    <option value="">Select a program</option>
-                    {programs.map(program => (
-                      <option key={program.id} value={program.id}>{program.title}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500/30 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors"
-                >
-                  Save Content
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
+   
 
         {/* Content List */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
