@@ -11,7 +11,7 @@ const AuditTray = () => {
     {
       id: 1,
       user: {
-        name: 'Pastor David Johnson',
+        name: 'Joseph Admin',
         email: 'pastor.david@churchdomain.org',
         role: 'Admin'
       },
@@ -26,9 +26,9 @@ const AuditTray = () => {
     {
       id: 2,
       user: {
-        name: 'Sarah Miller',
+        name: 'Joseph Admin',
         email: 'sarah.m@churchdomain.org',
-        role: 'Editor'
+        role: 'Admin'
       },
       data: {
         type: 'Daily Content',
@@ -41,9 +41,9 @@ const AuditTray = () => {
     {
       id: 3,
       user: {
-        name: 'Michael Chen',
+        name: 'Joseph Admin',
         email: 'michael.c@churchdomain.org',
-        role: 'Contributor'
+        role: 'Admin'
       },
       data: {
         type: 'Daily Content',
@@ -56,7 +56,7 @@ const AuditTray = () => {
     {
       id: 4,
       user: {
-        name: 'Lisa Rodriguez',
+        name: 'Joseph Admin',
         email: 'lisa.r@churchdomain.org',
         role: 'Admin'
       },
@@ -71,14 +71,14 @@ const AuditTray = () => {
     {
       id: 5,
       user: {
-        name: 'Pastor David Johnson',
+        name: 'Joseph Admin',
         email: 'pastor.david@churchdomain.org',
         role: 'Admin'
       },
       data: {
         type: 'User',
         name: 'James Wilson',
-        details: 'Added as Contributor'
+        details: 'Added as Admin'
       },
       action: 'Added',
       time: '2025-04-09T10:12:53'

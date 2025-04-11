@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
 
 
-export default function Login() {
+export default function NewPassword() {
     const [formData, setFormData] = useState({
         username: '',
         password: ''
@@ -51,7 +51,7 @@ export default function Login() {
                     {/* Header */}
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold text-blue-900">
-                            Admin Dashboard
+                            Update new password
                         </h1>
   
                     </div>
@@ -60,28 +60,10 @@ export default function Login() {
                     <form onSubmit={handleSubmit}>
                         <div className="mb-6">
                             <label
-                                htmlFor="username"
-                                className="block text-gray-700 font-medium mb-2"
-                            >
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-300 bg-white/70 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
-                                placeholder="Enter your email"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-6">
-                            <label
                                 htmlFor="password"
                                 className="block text-gray-700 font-medium mb-2"
                             >
-                                Password
+                                New password
                             </label>
                             <input
                                 type="password"
@@ -95,29 +77,29 @@ export default function Login() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id="remember"
-                                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="remember" className="ml-2 block text-gray-700">
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <div>
-                                <Link to="/request-reset" className="text-blue-900 hover:text-grey-700"> Forgot password? </Link>
-                   
-                            </div>
+                        <div className="mb-6">
+                            <label
+                                htmlFor="password"
+                                className="block text-gray-700 font-medium mb-2"
+                            >
+                              Confirm  Password
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-300 bg-white/70 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                placeholder="Enter your password"
+                                required
+                            />
                         </div>
-
                         <button
                             type="submit"
                             className="w-full bg-blue-900 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2 transition-colors shadow-lg"
                         >
-                            Login
+                            Save
                         </button>
                     </form>
                 </div>
