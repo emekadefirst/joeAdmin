@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ResponseSidebar from '../components/sidebar';
+import { Link } from "react-router-dom";
 
 const Programs = () => {
     const [selectedResponse, setSelectedResponse] = useState(null);
@@ -77,120 +78,109 @@ const Programs = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 mt-5">
+        <div className="flex h-screen bg-gray-50">
             {/* Sidebar Column */}
             <ResponseSidebar
                 responses={sampleResponses}
                 onSelectResponse={setSelectedResponse}
             />
-
+            {/* /programs/daily/add */}
             {/* Main Content Area */}
             <div className="flex-1 p-6 overflow-y-auto">
-                
-                    <h1 className="text-2xl font-bold text-blue-900 mb-6">Programs</h1>
 
-                    {/* Add Program Form */}
-                    <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-                        <h2 className="text-lg font-semibold text-blue-900 mb-4">Create New Program</h2>
-                        <form onSubmit={handleAddProgram} className="flex flex-col sm:flex-row gap-4">
-                            <input
-                                type="text"
-                                placeholder="Program title"
-                                value={programTitle}
-                                onChange={(e) => setProgramTitle(e.target.value)}
-                                className="flex-1 px-4 py-2 border border-blue-900/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/30"
-                                required
-                            />
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors"
-                            >
-                                Add Program
-                            </button>
-                        </form>
+                <h1 className="text-2xl font-bold text-blue-900 mb-6">Programs</h1>
+
+                {/* Add Program Form */}
+                <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h2 className='my-3'>Create New Program</h2>
+                    <Link
+                        to='/programs/daily/add'
+                        className="inline-block px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900/50 transition-colors"
+                    >
+                        Add new
+                    </Link>
+                </div>
+                {/* Programs List */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="p-4 bg-blue-900/5 border-b border-blue-900/10">
+                        <h2 className="font-semibold text-blue-900">Programs List</h2>
                     </div>
 
-                    {/* Programs List */}
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div className="p-4 bg-blue-900/5 border-b border-blue-900/10">
-                            <h2 className="font-semibold text-blue-900">Programs List</h2>
-                        </div>
-
-                        {programs.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-blue-900/5">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">ID</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Title</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Created At</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Actions</th>
+                    {programs.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-blue-900/5">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">ID</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Created At</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-blue-900/10">
+                                    {programs.map(program => (
+                                        <tr key={program.id} className="hover:bg-blue-50/50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{program.id}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {editingId === program.id ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editTitle}
+                                                        onChange={(e) => setEditTitle(e.target.value)}
+                                                        className="px-2 py-1 border border-blue-900/20 rounded focus:outline-none focus:ring-1 focus:ring-blue-900/30"
+                                                        autoFocus
+                                                        onBlur={handleUpdateProgram}
+                                                        onKeyPress={(e) => e.key === 'Enter' && handleUpdateProgram()}
+                                                    />
+                                                ) : (
+                                                    <span className="text-sm font-medium text-gray-900">{program.title}</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {formatDate(program.createdAt)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => startEditing(program)}
+                                                        className="text-blue-600 hover:text-blue-900 focus:outline-none"
+                                                        title="Edit"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteProgram(program.id)}
+                                                        className="text-red-600 hover:text-red-900 focus:outline-none"
+                                                        title="Delete"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-blue-900/10">
-                                        {programs.map(program => (
-                                            <tr key={program.id} className="hover:bg-blue-50/50">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{program.id}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {editingId === program.id ? (
-                                                        <input
-                                                            type="text"
-                                                            value={editTitle}
-                                                            onChange={(e) => setEditTitle(e.target.value)}
-                                                            className="px-2 py-1 border border-blue-900/20 rounded focus:outline-none focus:ring-1 focus:ring-blue-900/30"
-                                                            autoFocus
-                                                            onBlur={handleUpdateProgram}
-                                                            onKeyPress={(e) => e.key === 'Enter' && handleUpdateProgram()}
-                                                        />
-                                                    ) : (
-                                                        <span className="text-sm font-medium text-gray-900">{program.title}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {formatDate(program.createdAt)}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <div className="flex space-x-2">
-                                                        <button
-                                                            onClick={() => startEditing(program)}
-                                                            className="text-blue-600 hover:text-blue-900 focus:outline-none"
-                                                            title="Edit"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteProgram(program.id)}
-                                                            className="text-red-600 hover:text-red-900 focus:outline-none"
-                                                            title="Delete"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="py-10 text-center">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-10 w-10 mx-auto text-blue-900/20"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                                <p className="mt-2 text-sm text-blue-900/50">No programs found. Create your first program above.</p>
-                            </div>
-                        )}
-                    </div>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="py-10 text-center">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-10 w-10 mx-auto text-blue-900/20"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <p className="mt-2 text-sm text-blue-900/50">No programs found. Create your first program above.</p>
+                        </div>
+                    )}
+                </div>
 
             </div>
 

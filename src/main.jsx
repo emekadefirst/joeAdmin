@@ -8,6 +8,7 @@ import Login from './pages/login';
 import DashboardPage from './pages/dashboard';
 import DailyContent from './pages/dailystudy';
 import Programs from './pages/program';
+import CreateDailyPage from './pages/createprogram';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="programs" element={<Programs />} />
         <Route path="programs/daily" element={<DailyContent />} />
+        <Route path="programs/daily/add" element={<CreateDailyPage />} />
       </Routes>
     </Router>
   </StrictMode>
