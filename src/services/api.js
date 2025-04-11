@@ -1,5 +1,5 @@
-const apiDomain = process.env.REACT_APP_API_DOMAIN || 'http://localhost:8000';
-
+const apiDomain = 'http://127.0.0.1:8000';
+// window.REACT_APP_API_DOMAIN ||
 /**
  * Makes an API call to the specified endpoint
  * @param {string} path - API endpoint path
@@ -9,36 +9,38 @@ const apiDomain = process.env.REACT_APP_API_DOMAIN || 'http://localhost:8000';
  * @returns {Promise<any>} - Parsed JSON response
  * @throws {Error} - When request fails or response is not OK
  */
-async function apiCall(path, method, data = null, authToken = null) {
-  const noBodyMethods = ['GET', 'DELETE'];
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-  };
-
-  const config = {
-    method,
-    headers,
-    ...(!noBodyMethods.includes(method) && data && { body: JSON.stringify(data) })
-  };
-
+export default async function apiCall(endpoint, method, data, isFormData = false) {
   try {
-    const response = await fetch(`${apiDomain}/${path}`, config);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-    if (response.status === 204) {
-      return null;
-    }
-
-    return await response.json();
+      const headers = {};
+      
+      // Only set Content-Type for JSON requests, FormData sets its own boundary
+      if (!isFormData) {
+          headers['Content-Type'] = 'application/json';
+      }
+      
+      // Add auth token if available
+      if (localStorage.getItem('accessToken')) {
+          headers['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
+      }
+      
+      const requestOptions = {
+          method,
+          headers,
+          // Don't stringify FormData objects
+          body: isFormData ? data : JSON.stringify(data)
+      };
+      
+      const response = await fetch(`/api/${endpoint}`, requestOptions);
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+          console.error('API Error Details:', responseData);
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return responseData;
   } catch (error) {
-    console.error('API call failed:', error);
-    throw error;
+      console.error('API call failed:', error);
+      throw error;
   }
 }
-
-export default apiCall;

@@ -1,124 +1,28 @@
-import React, { useState } from 'react';
-import { Search, Filter, ChevronDown, ChevronUp, User, Clock, FileText, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { fetchAuditLogs } from '../services/audit';
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 
 const AuditTray = () => {
-  const [sortField, setSortField] = useState('time');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const [auditData, setAuditData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('timestamp');
+  const [sortDirection, setSortDirection] = useState('desc');
 
-  // Sample audit data
-  const auditData = [
-    {
-      id: 1,
-      user: {
-        name: 'Joseph Admin',
-        email: 'pastor.david@churchdomain.org',
-        role: 'Admin'
-      },
-      data: {
-        type: 'Program',
-        name: 'Fruits of the Spirit',
-        details: 'Bible study program content'
-      },
-      action: 'Created',
-      time: '2025-04-11T09:43:12'
-    },
-    {
-      id: 2,
-      user: {
-        name: 'Joseph Admin',
-        email: 'sarah.m@churchdomain.org',
-        role: 'Admin'
-      },
-      data: {
-        type: 'Daily Content',
-        name: 'Day 3: Patience',
-        details: 'Modified scripture references'
-      },
-      action: 'Updated',
-      time: '2025-04-10T16:22:45'
-    },
-    {
-      id: 3,
-      user: {
-        name: 'Joseph Admin',
-        email: 'michael.c@churchdomain.org',
-        role: 'Admin'
-      },
-      data: {
-        type: 'Daily Content',
-        name: 'Day 12: Faithfulness',
-        details: 'Added reflection questions'
-      },
-      action: 'Updated',
-      time: '2025-04-10T14:37:21'
-    },
-    {
-      id: 4,
-      user: {
-        name: 'Joseph Admin',
-        email: 'lisa.r@churchdomain.org',
-        role: 'Admin'
-      },
-      data: {
-        type: 'Program',
-        name: 'Book of Romans',
-        details: 'New program structure'
-      },
-      action: 'Created',
-      time: '2025-04-09T11:05:38'
-    },
-    {
-      id: 5,
-      user: {
-        name: 'Joseph Admin',
-        email: 'pastor.david@churchdomain.org',
-        role: 'Admin'
-      },
-      data: {
-        type: 'User',
-        name: 'James Wilson',
-        details: 'Added as Admin'
-      },
-      action: 'Added',
-      time: '2025-04-09T10:12:53'
-    }
-  ];
+  // Fetch audit logs on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchAuditLogs();
+        setAuditData(data);
+      } catch (error) {
+        console.error('Error fetching audit logs:', error);
+      }
+    };
 
-  // Sort function for audit data
-  const sortedData = [...auditData].sort((a, b) => {
-    if (sortField === 'time') {
-      return sortDirection === 'asc' 
-        ? new Date(a.time) - new Date(b.time)
-        : new Date(b.time) - new Date(a.time);
-    } else if (sortField === 'user') {
-      return sortDirection === 'asc'
-        ? a.user.name.localeCompare(b.user.name)
-        : b.user.name.localeCompare(a.user.name);
-    } else if (sortField === 'action') {
-      return sortDirection === 'asc'
-        ? a.action.localeCompare(b.action)
-        : b.action.localeCompare(a.action);
-    } else if (sortField === 'data') {
-      return sortDirection === 'asc'
-        ? a.data.name.localeCompare(b.data.name)
-        : b.data.name.localeCompare(a.data.name);
-    }
-    return 0;
-  });
+    fetchData();
+  }, []);
 
-  // Filter by search term
-  const filteredData = sortedData.filter(item => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      item.user.name.toLowerCase().includes(searchLower) ||
-      item.user.email.toLowerCase().includes(searchLower) ||
-      item.data.name.toLowerCase().includes(searchLower) ||
-      item.action.toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Handle sort toggle
+  // Sort function
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -128,217 +32,160 @@ const AuditTray = () => {
     }
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+  // Extract changed data title
+  const getChangedDataTitle = (item) => {
+    if (item.changes?.new?.title) {
+      return item.changes.new.title;
+    }
+    return item.model_name + ' #' + item.object_id;
   };
 
-  // Get icon for action type
-  const getActionIcon = (action) => {
-    switch(action) {
-      case 'Created':
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-          <FileText className="h-3 w-3 mr-1" />
-          {action}
-        </span>;
-      case 'Updated':
-        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-          <FileText className="h-3 w-3 mr-1" />
-          {action}
-        </span>;
-      case 'Deleted':
-        return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-          <AlertCircle className="h-3 w-3 mr-1" />
-          {action}
-        </span>;
-      case 'Added':
-        return <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-          <User className="h-3 w-3 mr-1" />
-          {action}
-        </span>;
-      default:
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-          <FileText className="h-3 w-3 mr-1" />
-          {action}
-        </span>;
+  // Filtered data based on search term
+  const filteredData = auditData.filter(item => {
+    const searchLower = searchTerm.toLowerCase();
+    const dataTitle = getChangedDataTitle(item).toLowerCase();
+    const userName = item.user?.name || item.user?.email || 'System';
+    
+    return (
+      userName.toLowerCase().includes(searchLower) ||
+      dataTitle.includes(searchLower) ||
+      item.action.toLowerCase().includes(searchLower) ||
+      item.model_name.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Sort data
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortField === 'user') {
+      const aValue = a.user?.name || a.user?.email || 'System';
+      const bValue = b.user?.name || b.user?.email || 'System';
+      return sortDirection === 'asc' 
+        ? aValue.localeCompare(bValue) 
+        : bValue.localeCompare(aValue);
+    } else if (sortField === 'data') {
+      const aValue = getChangedDataTitle(a);
+      const bValue = getChangedDataTitle(b);
+      return sortDirection === 'asc' 
+        ? aValue.localeCompare(bValue) 
+        : bValue.localeCompare(aValue);
+    } else if (sortField === 'action') {
+      return sortDirection === 'asc' 
+        ? a.action.localeCompare(b.action) 
+        : b.action.localeCompare(a.action);
+    } else {
+      return sortDirection === 'asc' 
+        ? new Date(a.timestamp) - new Date(b.timestamp)
+        : new Date(b.timestamp) - new Date(a.timestamp);
     }
-  };
+  });
+
+  // Column header component with sort indicators
+  const SortableHeader = ({ field, label }) => (
+    <th 
+      className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider cursor-pointer"
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center">
+        <span>{label}</span>
+        <span className="ml-1">
+          {sortField === field ? (
+            sortDirection === 'asc' ? (
+              <ChevronUp size={16} className="inline" />
+            ) : (
+              <ChevronDown size={16} className="inline" />
+            )
+          ) : null}
+        </span>
+      </div>
+    </th>
+  );
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="p-5 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-blue-900">Audit Log</h2>
-        <p className="text-sm text-gray-500">Track changes made to programs and content</p>
+    <div className="bg-white rounded-lg shadow mb-6">
+      <div className="p-6 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-blue-900">Activity Log</h2>
       </div>
 
-      {/* Search and Filter Bar */}
-      <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
-        <div className="relative flex-grow max-w-md">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
-          </div>
+      <div className="p-6">
+        <div className="relative mb-6">
           <input
             type="text"
-            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Search by user, action or content..."
+            placeholder="Search activity logs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
           />
+          <div className="absolute left-3 top-2.5 text-gray-400">
+            <Search size={18} />
+          </div>
         </div>
-        
-        <div className="flex items-center">
-          <button className="inline-flex items-center text-sm text-gray-700 bg-white border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50">
-            <Filter className="h-4 w-4 mr-2 text-gray-500" />
-            Filter
-            <ChevronDown className="h-4 w-4 ml-1 text-gray-500" />
-          </button>
-        </div>
-      </div>
 
-      {/* Table Header */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th 
-                scope="col" 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('user')}
-              >
-                <div className="flex items-center">
-                  User
-                  {sortField === 'user' && (
-                    sortDirection === 'asc' ? 
-                      <ChevronUp className="h-4 w-4 ml-1" /> : 
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                  )}
-                </div>
-              </th>
-              <th 
-                scope="col" 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('data')}
-              >
-                <div className="flex items-center">
-                  Data
-                  {sortField === 'data' && (
-                    sortDirection === 'asc' ? 
-                      <ChevronUp className="h-4 w-4 ml-1" /> : 
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                  )}
-                </div>
-              </th>
-              <th 
-                scope="col" 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('action')}
-              >
-                <div className="flex items-center">
-                  Action
-                  {sortField === 'action' && (
-                    sortDirection === 'asc' ? 
-                      <ChevronUp className="h-4 w-4 ml-1" /> : 
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                  )}
-                </div>
-              </th>
-              <th 
-                scope="col" 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('time')}
-              >
-                <div className="flex items-center">
-                  Time
-                  {sortField === 'time' && (
-                    sortDirection === 'asc' ? 
-                      <ChevronUp className="h-4 w-4 ml-1" /> : 
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                  )}
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredData.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{item.user.name}</div>
-                      <div className="text-xs text-gray-500">{item.user.email}</div>
-                      <div className="text-xs text-gray-500">Role: {item.user.role}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">{item.data.name}</div>
-                  <div className="text-xs text-gray-500">Type: {item.data.type}</div>
-                  <div className="text-xs text-gray-500">{item.data.details}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getActionIcon(item.action)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center text-gray-500">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {formatDate(item.time)}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div className="overflow-x-auto max-h-96">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <SortableHeader field="user" label="User" />
+                  <SortableHeader field="data" label="Data" />
+                  <SortableHeader field="action" label="Action" />
+                  <SortableHeader field="timestamp" label="Time" />
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {sortedData.length > 0 ? (
+                  sortedData.map((item, index) => (
+                    <tr key={item.id || index} className="hover:bg-blue-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {item.user?.name || item.user?.email || 'System Action'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          <span className="font-medium">{getChangedDataTitle(item)}</span>
+                          <span className="text-gray-500 text-xs ml-2">({item.model_name})</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${item.action === 'CREATE' ? 'bg-green-100 text-green-800' : 
+                           item.action === 'UPDATE' ? 'bg-blue-100 text-blue-800' : 
+                           item.action === 'DELETE' ? 'bg-red-100 text-red-800' : 
+                           'bg-gray-100 text-gray-800'}`}>
+                          {item.action}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(item.timestamp).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-10 text-center text-gray-500">
+                      <p className="font-medium">No activity logs found</p>
+                      <p className="text-sm mt-1">Activity will appear here as users interact with the system</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
       
-      {/* Pagination */}
-      <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div className="flex-1 flex justify-between sm:hidden">
-          <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Previous
-          </button>
-          <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Next
-          </button>
+      <div className="p-4 bg-gray-50 border-t border-gray-100 rounded-b-lg flex justify-between items-center">
+        <div className="text-sm text-gray-500">
+          {filteredData.length} {filteredData.length === 1 ? 'activity' : 'activities'} found
         </div>
-        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredData.length}</span> of{' '}
-              <span className="font-medium">{filteredData.length}</span> results
-            </p>
-          </div>
-          <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                <span className="sr-only">Previous</span>
-                <ChevronDown className="h-5 w-5 transform rotate-90" />
-              </button>
-              <button className="bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                1
-              </button>
-              <button className="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                2
-              </button>
-              <button className="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium">
-                3
-              </button>
-              <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                <span className="sr-only">Next</span>
-                <ChevronDown className="h-5 w-5 transform -rotate-90" />
-              </button>
-            </nav>
-          </div>
-        </div>
+        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+          Export logs →
+        </button>
       </div>
     </div>
   );

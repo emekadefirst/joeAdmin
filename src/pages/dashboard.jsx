@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Book, Calendar, ChevronRight, Clock, Users } from 'lucide-react';
 import ResponseSidebar from '../components/sidebar';
+import { fetchAllDaily } from '../services/getalldaily';
 import AuditTray from '../components/audit';
-
 const DashboardPage = () => {
   const [selectedResponse, setSelectedResponse] = useState(null);
-  
-  // Sample data - replace with actual data from your backend
-  const totalPrograms = 8;
-  const totalDailyContent = 124;
-  
-  const recentPrograms = [
-    {
-      id: 1,
-      title: "Fruits of the Spirit",
-      description: "A 21-day study on Galatians 5:22-23",
-      participants: 24,
-      progress: 65
-    }
-  ];
+
+  // State to hold data from the API
+  const [totalPrograms, setTotalPrograms] = useState(0);
+  const [totalDailyContent, setTotalDailyContent] = useState(0);
+  const [dailyContent, setDailyContent] = useState([]);
+
+  // State to hold the filter term
+  const [filterTerm, setFilterTerm] = useState('');
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/counts/');
+        const data = await response.json();
+        setTotalPrograms(data.program);
+        setTotalDailyContent(data.dailycontent);
+
+        // Fetch daily content using the service method
+        const dailyData = await fetchAllDaily(); // Calling the service to fetch daily content
+        setDailyContent(dailyData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); 
+
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const todaysContent = dailyContent.filter(item => item.date === today);
+
+  const filteredPrograms = todaysContent.filter(program =>
+    program.title.toLowerCase().includes(filterTerm.toLowerCase()) ||
+    program.description.toLowerCase().includes(filterTerm.toLowerCase())
+  );
+
 
   const sampleResponses = [
     {
@@ -29,8 +54,12 @@ const DashboardPage = () => {
       time: '10:30 AM',
       unread: false
     },
-    // ... more responses
   ];
+
+  // Handle filter input change
+  const handleFilterChange = (e) => {
+    setFilterTerm(e.target.value);
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -73,14 +102,25 @@ const DashboardPage = () => {
           </div>
         </div>
         
-        {/* Programs Overview Card - Full Width */}
+        {/* Search Filter */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Filter Programs"
+            value={filterTerm}
+            onChange={handleFilterChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+
+        {/* Programs Overview Card */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-blue-900">Study of the day</h2>
           </div>
           
           <div className="divide-y divide-gray-100">
-            {recentPrograms.map(program => (
+            {filteredPrograms.map(program => (
               <div key={program.id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-center">
                   <div>
@@ -118,7 +158,7 @@ const DashboardPage = () => {
             </button>
           </div>
         </div>
-        <AuditTray />
+        
         {/* Selected Response Content */}
         {selectedResponse && (
           <div className="bg-white p-6 rounded-lg shadow">
@@ -135,9 +175,9 @@ const DashboardPage = () => {
             </div>
           </div>
         )}
-      
+        <AuditTray />
       </div>
-
+      
     </div>
   );
 };
