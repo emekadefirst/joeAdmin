@@ -1,25 +1,23 @@
 import apiDomain from "./api";
 
-export const fetchAuditLogs = async () => {
+export const GetPrograms = async () => {
   const Token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`${apiDomain}/audit-log/audit-logs/`, {
+    const response = await fetch(`${apiDomain}/api/programs`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Token}`,  
       },
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch audit logs: ${response.status}`);
+      throw new Error(`Failed to fetch Programs: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(data)
     return data;
   } catch (error) {
-    console.error('Error fetching audit logs:', error);
+    console.error('Error fetching audit Programs:', error);
     return [];
   }
 };

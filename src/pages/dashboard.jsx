@@ -39,10 +39,10 @@ const DashboardPage = () => {
 
   const todaysContent = dailyContent.filter(item => item.date === today);
 
-  const filteredPrograms = todaysContent.filter(program =>
-    program.title.toLowerCase().includes(filterTerm.toLowerCase()) ||
-    program.description.toLowerCase().includes(filterTerm.toLowerCase())
-  );
+  // const filteredPrograms = todaysContent.filter(program =>
+  //   program.title.toLowerCase().includes(filterTerm.toLowerCase()) ||
+  //   program.description.toLowerCase().includes(filterTerm.toLowerCase())
+  // );
 
 
   const sampleResponses = [
@@ -120,7 +120,7 @@ const DashboardPage = () => {
           </div>
           
           <div className="divide-y divide-gray-100">
-            {filteredPrograms.map(program => (
+            {/* {filteredPrograms.map(program => (
               <div key={program.id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-center">
                   <div>
@@ -149,7 +149,7 @@ const DashboardPage = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))} */}
           </div>
           
           <div className="p-4 bg-gray-50 border-t border-gray-100 rounded-b-lg">

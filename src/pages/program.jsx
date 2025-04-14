@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ResponseSidebar from '../components/sidebar';
 import { Link } from "react-router-dom";
+import { GetPrograms } from '../services/getprograms';
+import { CreatePrograms } from '../services/createprogram';
 
 const Programs = () => {
     const [selectedResponse, setSelectedResponse] = useState(null);
     const [programTitle, setProgramTitle] = useState('');
     const [programs, setPrograms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [editTitle, setEditTitle] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
@@ -20,33 +24,58 @@ const Programs = () => {
             time: '10:30 AM',
             unread: false
         },
-        // ... more responses
+        
     ];
 
-    // Initialize with some sample programs
     useEffect(() => {
-        const samplePrograms = [
-            { id: 1, title: 'Morning Workout', createdAt: '2025-04-08T08:30:00Z' },
-            { id: 2, title: 'Evening Meditation', createdAt: '2025-04-09T18:15:00Z' },
-            { id: 3, title: 'Weekend Training', createdAt: '2025-04-10T10:00:00Z' }
-        ];
-        setPrograms(samplePrograms);
-    }, []);
-
-    const handleAddProgram = (e) => {
-        e.preventDefault();
-        if (!programTitle.trim()) return;
-
-        const newProgram = {
-            id: Date.now(),
-            title: programTitle,
-            createdAt: new Date().toISOString()
+        const fetchPrograms = async () => {
+            setLoading(true);
+            try {
+                const data = await GetPrograms();
+                if (Array.isArray(data)) {
+                    setPrograms(data);
+                } else if (data && data.results && Array.isArray(data.results)) {
+                    // Handle if API returns results in a nested object
+                    setPrograms(data.results);
+                } else {
+                    // Handle any other structure the API might return
+                    console.warn("Unexpected data format from API:", data);
+                    setPrograms([]);
+                }
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching programs:", err);
+                setError("Failed to load programs. Please try again later.");
+                setPrograms([]);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        setPrograms([newProgram, ...programs]);
-        setProgramTitle('');
-        setIsModalOpen(false); // Close the modal after adding the program
+        fetchPrograms();
+    }, []);
+
+    const handleSubmit = async () => {
+        if (!programTitle.trim()) return;
+
+        setLoading(true);
+        try {
+            const newProgram = await CreatePrograms({ title: programTitle });
+            if (newProgram) {
+                setPrograms([newProgram, ...programs]);
+                setProgramTitle('');
+                setIsModalOpen(false);
+            } else {
+                alert('Failed to create program.');
+            }
+        } catch (error) {
+            console.error('Error creating program:', error);
+            alert('Something went wrong while creating the program.');
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const handleDeleteProgram = (id) => {
         setPrograms(programs.filter(program => program.id !== id));
@@ -103,10 +132,12 @@ const Programs = () => {
                     </div>
 
                     {/* Modal */}
+
                     {isModalOpen && (
-                        <div className="fixed inset-0  bg-transparent z-0 backdrop-blur-md backdrop-brightness-50 bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="fixed inset-0 bg-transparent backdrop-blur-md backdrop-brightness-50 bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                                 <h3 className="text-lg font-semibold mb-4">Add Program Title</h3>
+
                                 <input
                                     type="text"
                                     value={programTitle}
@@ -114,22 +145,26 @@ const Programs = () => {
                                     placeholder="Program Title"
                                     className="w-full px-4 py-2 border rounded-md mb-4"
                                 />
-                                <div className="flex justify-between">
+
+                                <div className="flex justify-end gap-4">
                                     <button
                                         onClick={() => setIsModalOpen(false)}
                                         className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
                                     >
                                         Cancel
                                     </button>
+
                                     <button
-                                        onClick={handleAddProgram}
-                                        className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800"
+                                        onClick={handleSubmit}
+                                        disabled={loading}
+                                        className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800 disabled:opacity-50"
                                     >
-                                        Submit
+                                        {loading ? 'Submitting...' : 'Submit'}
                                     </button>
                                 </div>
                             </div>
                         </div>
+
                     )}
                 </div>
 
@@ -139,7 +174,19 @@ const Programs = () => {
                         <h2 className="font-semibold text-blue-900">Programs List</h2>
                     </div>
 
-                    {programs.length > 0 ? (
+                    {loading ? (
+                        <div className="py-10 text-center">
+                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900"></div>
+                            <p className="mt-2 text-sm text-blue-900/50">Loading programs...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="py-10 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-red-500/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="mt-2 text-sm text-red-500/70">{error}</p>
+                        </div>
+                    ) : programs.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-blue-900/5">
@@ -153,7 +200,7 @@ const Programs = () => {
                                 <tbody className="divide-y divide-blue-900/10">
                                     {programs.map(program => (
                                         <tr key={program.id} className="hover:bg-blue-50/50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{program.id}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{program.id}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {editingId === program.id ? (
                                                     <input
@@ -170,7 +217,7 @@ const Programs = () => {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {formatDate(program.createdAt)}
+                                                {formatDate(program.created_at || program.createdAt)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 <div className="flex space-x-2">

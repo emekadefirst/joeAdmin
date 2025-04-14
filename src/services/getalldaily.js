@@ -1,4 +1,4 @@
-const apiDomain = 'http://127.0.0.1:8000';
+import apiDomain from "./api";
 
 
 export const fetchAllDaily = async () => {

@@ -1,6 +1,4 @@
-import apiCall from "./api";
-
-const apiDomain = 'http://127.0.0.1:8000';
+import apiDomain from "./api";
 
 const LoginService = async ({ email, password }) => {
     try {

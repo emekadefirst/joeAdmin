@@ -1,5 +1,8 @@
 const apiDomain = 'http://127.0.0.1:8000';
+// const apiDomain = 'http://127.0.0.1:8000';
 // window.REACT_APP_API_DOMAIN ||
+
+export default apiDomain;
 /**
  * Makes an API call to the specified endpoint
  * @param {string} path - API endpoint path
@@ -9,7 +12,7 @@ const apiDomain = 'http://127.0.0.1:8000';
  * @returns {Promise<any>} - Parsed JSON response
  * @throws {Error} - When request fails or response is not OK
  */
-export default async function apiCall(endpoint, method, data, isFormData = false) {
+async function apiCall(endpoint, method, data, isFormData = false) {
   try {
       const headers = {};
       

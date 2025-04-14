@@ -3,15 +3,6 @@ import ResponseSidebar from '../components/sidebar';
 import CreateDailyContent from "../components/createdaily";
 
 const CreateDailyPage = () => {
-  // Example sampleResponses data
-  const sampleResponses = [
-    { id: 1, title: "Response 1" },
-    { id: 2, title: "Response 2" },
-    { id: 3, title: "Response 3" },
-  ];
-
-  // State to track the selected response and other form fields
-  const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState("");
   const [contentTitle, setContentTitle] = useState("");
   const [excelFile, setExcelFile] = useState(null); // State to handle the file upload
@@ -39,14 +30,13 @@ const CreateDailyPage = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar Column */}
       <ResponseSidebar 
-        responses={sampleResponses}
-        onSelectResponse={setSelectedResponse}
+
       />
 
       {/* Main Content Area */}
       <div className="flex-1 p-6 overflow-y-auto mt-15">
         <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-          <h2 className="text-lg font-semibold text-blue-900 mb-4">Create New Content</h2>
+          <h2 className="text-lg font-semibold text-blue-900 mb-4">Upload Bulk Daily content</h2>
           <form onSubmit={handleAddContent} className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               {/* File Input for Excel */}
@@ -62,25 +52,6 @@ const CreateDailyPage = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/30"
                   required
                 />
-              </div>
-
-              {/* Program Select */}
-              <div>
-                <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-1">
-                  Program
-                </label>
-                <select
-                  id="program"
-                  value={selectedProgram}
-                  onChange={(e) => setSelectedProgram(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/30"
-                  required
-                >
-                  <option value="">Select a program</option>
-                  {programs.map(program => (
-                    <option key={program.id} value={program.id}>{program.title}</option>
-                  ))}
-                </select>
               </div>
             </div>
 
