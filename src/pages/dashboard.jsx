@@ -4,7 +4,7 @@ import ResponseSidebar from '../components/sidebar';
 import { fetchAllDaily } from '../services/getalldaily';
 import AuditTray from '../components/audit';
 import apiDomain from '../services/api';
-import { Link, useLocation } from "react-router-dom";
+
 const DashboardPage = () => {
   const [selectedResponse, setSelectedResponse] = useState(null);
 
