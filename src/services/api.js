@@ -7,8 +7,8 @@
 
 
 
-// const apiDomain = process.env.REACT_APP_API_DOMAIN || 'http://127.0.0.1:8000'; 
-export const apiDomain = 'http://127.0.0.1:8000'
+const apiDomain = process.env.REACT_APP_API_DOMAIN || 'http://127.0.0.1:8000'; 
+// export const apiDomain = 'http://127.0.0.1:8000'
 import axios from "axios";
 
 export async function ApiCall(endpoint, method = 'GET', Token = null, data = null) {
