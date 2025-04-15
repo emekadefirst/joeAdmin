@@ -3,7 +3,7 @@ import { Book, Calendar, ChevronRight, Clock, Users } from 'lucide-react';
 import ResponseSidebar from '../components/sidebar';
 import { fetchAllDaily } from '../services/getalldaily';
 import AuditTray from '../components/audit';
-import apiDomain from '../services/api';
+import { apiDomain } from '../services/api';
 
 const DashboardPage = () => {
   const [selectedResponse, setSelectedResponse] = useState(null);
@@ -13,7 +13,7 @@ const DashboardPage = () => {
   const [totalDailyContent, setTotalDailyContent] = useState(0);
   const [dailyContent, setDailyContent] = useState([]);
 
-  // State to hold the filter term
+
   const [filterTerm, setFilterTerm] = useState('');
 
   // Fetch data from API

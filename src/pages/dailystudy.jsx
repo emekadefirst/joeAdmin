@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Book, Clock, Search, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
 import ResponseSidebar from '../components/sidebar';
 import { Link } from "react-router-dom";
-import { fetchAllDaily } from '../services/getalldaily'; // Adjust the import path as needed
+import { fetchAllDaily } from '../services/getalldaily';
+import { deleteDaily } from '../services/deletedaily';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import EditDailyModal from '../components/editdaily';
 
 const DailyContent = () => {
   const [dailyContent, setDailyContent] = useState([]);
@@ -14,27 +18,24 @@ const DailyContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Sample responses for the sidebar
-  const sampleResponses = [
-    {
-      id: 1,
-      title: 'Welcome Message',
-      preview: 'Thank you for contacting us...',
-      content: 'Full welcome message content would go here...',
-      time: '10:30 AM',
-      unread: false
-    },
-    // ... more responses
-  ];
 
-  // Fetch actual data from API
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDailyId, setSelectedDailyId] = useState(null);
+
+  // Function to open the edit modal
+  const openEditModal = (id) => {
+    setSelectedDailyId(id);
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const data = await fetchAllDaily();
         setDailyContent(data);
-        
+
         // Extract unique programs from daily content
         if (data && data.length > 0) {
           const uniquePrograms = [...new Set(data.map(item => item.program))];
@@ -56,59 +57,82 @@ const DailyContent = () => {
     fetchData();
   }, []);
 
-  const handleDeleteContent = (id) => {
-    // Here you would typically call an API to delete the content
-    // For now, we'll just update the UI
-    setDailyContent(dailyContent.filter(content => content.id !== id));
+
+  const handleDeleteContent = async (id) => {
+    const result = await deleteDaily(id);
+
+    if (result.success) {
+      setDailyContent(prev => prev.filter(content => content.id !== id));
+      toast.success("Program deleted successfully!");
+    } else {
+      console.error("Failed to delete program:", result.error || "Unknown error");
+      toast.error("An error occurred while deleting the program.");
+    }
   };
 
-  const startEditing = (content) => {
-    setEditingId(content.id);
-    setEditTitle(content.title || content.topic); // Adjust based on your API response structure
-    
-    // Find program ID based on program name
-    const program = programs.find(p => p.title === content.program);
-    setEditProgram(program ? program.id.toString() : '');
-  };
-
-  const handleUpdateContent = () => {
+  const handleUpdateContent = async () => {
     if (!editTitle.trim() || !editProgram) return;
 
     const programObj = programs.find(p => p.id === parseInt(editProgram));
-    
-    // Here you would typically call an API to update the content
-    // For now, we'll just update the UI
-    setDailyContent(dailyContent.map(content =>
-      content.id === editingId ? { 
-        ...content, 
-        title: editTitle,
-        topic: editTitle, // Update both title and topic based on your data structure
-        programId: parseInt(editProgram),
-        program: programObj.title
-      } : content
-    ));
 
-    setEditingId(null);
-    setEditTitle('');
-    setEditProgram('');
+    const updatedData = {
+      topic: editTitle,
+      title: editTitle, // if both exist in your DB
+      program: programObj.title,
+    };
+
+    try {
+      const response = await editDailyProgram(editingId, updatedData);
+
+      if (response) {
+        // Update the local state/UI
+        setDailyContent(dailyContent.map(content =>
+          content.id === editingId
+            ? {
+              ...content,
+              title: editTitle,
+              topic: editTitle,
+              programId: parseInt(editProgram),
+              program: programObj.title,
+            }
+            : content
+        ));
+        setEditingId(null);
+        setEditTitle('');
+        setEditProgram('');
+      } else {
+        console.error("Failed to update on server.");
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
 
+  const handleContentUpdate = (updatedContent) => {
+    // Update the dailyContent state with the new content
+    setDailyContent(prevContent =>
+      prevContent.map(item =>
+        item.id === updatedContent.id ? updatedContent : item
+      )
+    );
+  };
   const formatDate = (dateString) => {
     const options = {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
 
   // Filter content based on search term
   const filteredContent = dailyContent.filter(content => {
     const title = content.title || content.topic || ''; // Adjust based on your API response
     const program = content.programTitle || content.program || ''; // Adjust based on your API response
-    
+
     return (
       title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       program.toLowerCase().includes(searchTerm.toLowerCase())
@@ -119,7 +143,7 @@ const DailyContent = () => {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar Column */}
       <ResponseSidebar
-        responses={sampleResponses}
+
       />
 
       {/* Main Content Area */}
@@ -183,7 +207,7 @@ const DailyContent = () => {
                   <tbody className="divide-y divide-blue-900/10">
                     {filteredContent.map(content => (
                       <tr key={content.id} className="hover:bg-blue-50/50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{content.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{content.id}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Book className="h-4 w-4 text-blue-900 mr-2" />
@@ -232,13 +256,7 @@ const DailyContent = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="flex space-x-2">
                             <button
-                              className="text-blue-600 hover:text-blue-900 focus:outline-none transition-transform hover:scale-110"
-                              title="View"
-                            >
-                              <Eye className="h-5 w-5" />
-                            </button>
-                            <button
-                              onClick={() => startEditing(content)}
+                              onClick={() => openEditModal(content.id)}
                               className="text-blue-600 hover:text-blue-900 focus:outline-none transition-transform hover:scale-110"
                               title="Edit"
                             >
@@ -256,14 +274,21 @@ const DailyContent = () => {
                       </tr>
                     ))}
                   </tbody>
+                  <EditDailyModal
+                    id={selectedDailyId}
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onUpdateSuccess={handleContentUpdate} // Add this prop
+                  />
+
                 </table>
               </div>
             ) : (
               <div className="py-10 text-center">
                 <Calendar className="h-10 w-10 mx-auto text-blue-900/20" />
                 <p className="mt-2 text-sm text-blue-900/50">
-                  {searchTerm 
-                    ? "No content matches your search." 
+                  {searchTerm
+                    ? "No content matches your search."
                     : "No daily content found. Create your first content using the 'Add Daily Content' button."}
                 </p>
               </div>

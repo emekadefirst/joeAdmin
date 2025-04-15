@@ -1,4 +1,4 @@
-import apiDomain from "./api";
+import { apiDomain } from "./api";
 
 export const fetchAuditLogs = async () => {
   const Token = localStorage.getItem('accessToken');

@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { LogoutService } from '../services/auth/logout';
+import { LogOut } from "lucide-react"; // optional: using lucide-react logout icon
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = ({ responses = [] }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -8,7 +12,20 @@ const Sidebar = ({ responses = [] }) => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
+  const handleLogout = async () => {
+    try {
+      const success = await LogoutService();
+      if (success) {
+        toast.success('Logout successful');
+        window.location.href = '/';
+      } else {
+        toast.error('Logout failed. Please try again.');
+      }
+    } catch (error) {
+      toast.error('An error occurred during logout');
+      console.error('Logout error:', error);
+    }
+  };
   // Function to determine if the link is active
   const isActive = (path) => location.pathname === path ? 'bg-blue-900 text-white' : 'text-blue-900 hover:bg-blue-50';
 
@@ -79,6 +96,18 @@ const Sidebar = ({ responses = [] }) => {
           {/* Account Settings at footer */}
           <div className="mt-auto border-t border-blue-900/10">
             <div className="p-3">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-md shadow-sm hover:bg-blue-50 transition-colors"
+              >
+                <LogOut className="w-5 h-5 mr-2 text-blue-600" />
+                <span>Logout</span>
+              </button>
+
+
+
+
+
               <Link to="#" className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-blue-900 hover:bg-blue-50 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-blue-900/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
