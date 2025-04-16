@@ -13,7 +13,8 @@ export async function LogoutService() {
     const response = await ApiCall('/users/v1/logout/', 'POST', accessToken, {
       refresh_token: refreshToken
     });
-
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('userID');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
