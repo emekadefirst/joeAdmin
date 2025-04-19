@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditDailyModal from '../components/editdaily';
 
+
 const DailyContent = () => {
   const [dailyContent, setDailyContent] = useState([]);
   const [programs, setPrograms] = useState([]);

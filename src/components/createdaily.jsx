@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GetPrograms } from "../services/getprograms"; 
 import CreateDailyService from "../services/createdaily";
 
+
 const CreateDailyContent = () => {
     const [selectedProgram, setSelectedProgram] = useState("");
     const [contentTitle, setContentTitle] = useState("");
@@ -63,6 +64,11 @@ const CreateDailyContent = () => {
         } finally {
             setIsSubmitting(false);
         }
+    };
+    const buklupload = async (e) => {
+        // handle event or file upload logic here
+        const data = await bulk(e); // Assuming 'e' is the upload data
+        console.log(data);
     };
 
     return (

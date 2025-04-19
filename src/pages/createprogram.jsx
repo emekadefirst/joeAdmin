@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ResponseSidebar from '../components/sidebar';
 import CreateDailyContent from "../components/createdaily";
+import { bulk } from '../services/daily/bulk';
 
 const CreateDailyPage = () => {
   const [selectedProgram, setSelectedProgram] = useState("");
@@ -14,17 +15,24 @@ const CreateDailyPage = () => {
     // Add more programs as needed
   ];
 
-  // Handle form submission
-  const handleAddContent = (e) => {
+
+
+  const handleAddContent = async (e) => {
     e.preventDefault();
-    const formData = {
-      contentTitle,
-      excelFile,
-      selectedProgram,
-    };
-    console.log("Form Submitted", formData);
-    // Handle your submit logic here (e.g., send formData to API)
-  };
+
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('upload', excelFile);  // `excelFile` is the file from the input field
+
+    try {
+        // Send the FormData to the API using the bulk function
+        const responseMessage = await bulk(formData);
+        console.log("Upload successful:", responseMessage);
+    } catch (error) {
+        console.error("Error uploading file:", error);
+    }
+};
+
 
   return (
     <div className="flex h-screen bg-gray-100">
