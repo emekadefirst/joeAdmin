@@ -9,7 +9,7 @@
 
 // export const apiDomain = process.env.REACT_APP_API_DOMAIN || 'http://127.0.0.1:8000'; 
 // export const apiDomain = 'http://127.0.0.1:8000'
-export const apiDomain = 'https://pale-joellen-emekadefirst-db64cc83.koyeb.app';
+export const apiDomain = 'https://political-rozalin-nilvfgfgfhujkiki-b8a5dc3b.koyeb.app';
 import axios from "axios";
 
 export async function ApiCall(endpoint, method = 'GET', Token = null, data = null) {
